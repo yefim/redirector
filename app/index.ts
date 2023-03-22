@@ -1,5 +1,6 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import requestIp from 'request-ip';
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -12,7 +13,19 @@ app.get('/healthcheck', (_req, res) => {
   res.send('hello world');
 });
 
+app.get('/link', (_req, res) => {
+  res.send('<a href="/">link</a>');
+});
+
+app.get('/ip', (req, res) => {
+  const ip = requestIp.getClientIp(req);
+  res.send(ip);
+});
+
 app.get('/', async (req, res) => {
+  console.log(req);
+  console.log(req.headers);
+
   const link = await prisma.shortLink.findUnique({
     where: {
       host: req.hostname,
