@@ -34,7 +34,7 @@ app.get('/', async (req, res) => {
       },
     });
 
-    res.send(`redirecting to ${link.redirectUrl}`);
+    res.redirect(302, link.redirectUrl);
   } else {
     res.status(200).send(`link does not exist for ${req.hostname}`);
   }
@@ -108,7 +108,7 @@ app.post('/edit', async (req, res) => {
   const hostname = req.hostname;
   const { redirectUrl, password } = req.body;
 
-  if (redirectUrl && password === 'TESTING') {
+  if (redirectUrl && password === process.env.EDIT_PASSWORD) {
     const link = await prisma.shortLink.upsert({
       where: {
         host: hostname,
