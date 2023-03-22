@@ -14,3 +14,11 @@ model Count {
   id    String @id @default(uuid())
   count Int    @default(0)
 }
+
+model ShortLink {
+  linkId      String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  host        String   @unique
+  redirectUrl String
+}

@@ -1,99 +1,76 @@
-import http from "http";
+import express from 'express';
+import bodyParser from 'body-parser';
 import { PrismaClient } from "@prisma/client";
+
 const prisma = new PrismaClient();
+const app = express();
+const port = process.env.PORT || 3333;
 
-async function getCurrentCount() {
-  let currentCount = await prisma.count.findFirst();
-  if (!currentCount) {
-    currentCount = await prisma.count.create({
-      data: { count: 0 },
-    });
+app.use(bodyParser.urlencoded({extended: false}));
+
+app.get('/healthcheck', (_req, res) => {
+  res.send('hello world');
+});
+
+app.get('/', async (req, res) => {
+  const link = await prisma.shortLink.findUnique({
+    where: {
+      host: req.hostname,
+    },
+  });
+
+  if (link) {
+    // TODO: log the hit
+
+    res.send(`redirecting to ${link.redirectUrl}`);
+  } else {
+    res.send(`link does not exist for ${req.hostname}`);
   }
-  return currentCount;
-}
+});
 
-async function parseFormBody(req: http.IncomingMessage) {
-  const body = await new Promise<string>((resolve) => {
-    let body = "";
-    req.on("data", (chunk) => {
-      body += chunk;
-    });
-    req.on("end", () => {
-      resolve(body);
-    });
+app.get('/edit', async (req, res) => {
+  const link = await prisma.shortLink.findUnique({
+    where: {
+      host: req.hostname,
+    },
   });
-  const params = new URLSearchParams(body);
-  return params;
-}
 
-const server = http
-  .createServer(async (req, res) => {
-    console.log(`${req.method} ${req.url}`);
+  res.send(`<form method="post" action="" onsubmit="navigator.clipboard.writeText('https://' + window.location.host)">
+      <label>Redirect URL
+        <input type="text" name="redirectUrl" value="${link && link.redirectUrl || ''}">
+      </label>
+      <label>Password
+        <input type="password" name="password">
+      </label>
+      <button type="submit">Submit</button>
+    </form>`);
+});
 
-    switch (`${req.method} ${req.url}`) {
-      case "GET /healthcheck": {
-        try {
-          await getCurrentCount();
-          res.writeHead(200);
-          res.end("OK");
-        } catch (error: unknown) {
-          console.error(error);
-          res.writeHead(500);
-          res.end("ERROR");
-        }
-        break;
-      }
-      case "POST /": {
-        const params = await parseFormBody(req);
-        const intent = params.get("intent");
-        const currentCount = await getCurrentCount();
-        if (intent !== "increment" && intent !== "decrement") {
-          return res.end("Invalid intent");
-        }
-        await prisma.count.update({
-          where: { id: currentCount.id },
-          data: { count: { [intent]: 1 } },
-        });
-        res.writeHead(302, { Location: "/" });
-        res.end();
-        break;
-      }
-      case "GET /": {
-        let currentCount = await getCurrentCount();
-        res.setHeader("Content-Type", "text/html");
-        res.writeHead(200);
-        res.end(/* html */ `
-<html>
-  <head>
-    <title>Demo App</title>
-  </head>
-  <body>
-    <h1>Demo App</h1>
-    <form method="POST">
-      <button type="submit" name="intent" value="decrement">-</button>
-      <span>${currentCount.count}</span>
-      <button type="submit" name="intent" value="increment">+</button>
-    </form>
-  </body>
-</html>
-        `);
-        break;
-      }
-      default: {
-        res.writeHead(404);
-        return res.end("Not found");
-      }
-    }
-  })
-  .listen(process.env.PORT, () => {
-    const address = server.address();
-    if (!address) {
-      console.log("Server listening");
-      return;
-    }
-    const url =
-      typeof address === "string"
-        ? address
-        : `http://localhost:${address.port}`;
-    console.log(`Server listening at ${url}`);
-  });
+app.post('/edit', async (req, res) => {
+  const hostname = req.hostname;
+  const {
+    redirectUrl,
+    password,
+  } = req.body;
+
+  if (redirectUrl && password === 'TESTING') {
+    const link = await prisma.shortLink.upsert({
+      where: {
+        host: hostname,
+      },
+      update: { redirectUrl },
+      create: {
+        host: hostname,
+        redirectUrl,
+      },
+    });
+
+    res.redirect(link.redirectUrl);
+  } else {
+    res.send('wrong password');
+  }
+});
+
+app.listen(port, () => {
+  console.log(`Server listening on ${port}`);
+});
