@@ -9,8 +9,11 @@ const port = process.env.PORT || 3333;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get('/healthcheck', (_req, res) => {
-  res.send('hello world');
+app.get('/healthcheck', async (_req, res) => {
+  console.log('Healthcheck hit.');
+  // Make sure we can hit DB.
+  await prisma.shortLink.findFirst();
+  res.status(200).send('OK');
 });
 
 app.get('/', async (req, res) => {
@@ -33,7 +36,7 @@ app.get('/', async (req, res) => {
 
     res.send(`redirecting to ${link.redirectUrl}`);
   } else {
-    res.status(404).send(`link does not exist for ${req.hostname}`);
+    res.status(200).send(`link does not exist for ${req.hostname}`);
   }
 });
 
