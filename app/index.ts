@@ -1,13 +1,13 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import requestIp from 'request-ip';
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 const app = express();
 const port = process.env.PORT || 3333;
 
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/healthcheck', (_req, res) => {
   res.send('hello world');
@@ -21,13 +21,15 @@ app.get('/', async (req, res) => {
   });
 
   if (link) {
-    await prisma.hit.create({data: {
-      userAgent: req.headers['user-agent'] || null,
-      ipAddr: requestIp.getClientIp(req) || null,
-      referer: req.headers['referer'] || null,
-      rawHeaders: JSON.stringify(req.headers),
-      linkId: link.linkId,
-    }});
+    await prisma.hit.create({
+      data: {
+        userAgent: req.headers['user-agent'] || null,
+        ipAddr: requestIp.getClientIp(req) || null,
+        referer: req.headers['referer'] || null,
+        rawHeaders: JSON.stringify(req.headers),
+        linkId: link.linkId,
+      },
+    });
 
     res.send(`redirecting to ${link.redirectUrl}`);
   } else {
@@ -39,7 +41,7 @@ app.get('/count', async (req, res) => {
   const hitCount = await prisma.hit.count({
     where: {
       shortLink: { host: req.hostname },
-    }
+    },
   });
 
   if (hitCount > 0) {
@@ -77,15 +79,19 @@ app.get('/edit', async (req, res) => {
     },
   });
 
-  const hitCount = link ? await prisma.hit.count({
-    where: {
-      linkId: link.linkId
-    }
-  }) : 0;
+  const hitCount = link
+    ? await prisma.hit.count({
+        where: {
+          linkId: link.linkId,
+        },
+      })
+    : 0;
 
   res.send(`<form method="post" action="" onsubmit="navigator.clipboard.writeText('https://' + window.location.host)">
       <label>Redirect URL
-        <input type="text" name="redirectUrl" value="${link && link.redirectUrl || ''}">
+        <input type="text" name="redirectUrl" value="${
+          (link && link.redirectUrl) || ''
+        }">
       </label>
       <label>Password
         <input type="password" name="password">
@@ -97,10 +103,7 @@ app.get('/edit', async (req, res) => {
 
 app.post('/edit', async (req, res) => {
   const hostname = req.hostname;
-  const {
-    redirectUrl,
-    password,
-  } = req.body;
+  const { redirectUrl, password } = req.body;
 
   if (redirectUrl && password === 'TESTING') {
     const link = await prisma.shortLink.upsert({
