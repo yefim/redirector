@@ -21,4 +21,16 @@ model ShortLink {
   updatedAt   DateTime @updatedAt
   host        String   @unique
   redirectUrl String
+  hits        Hit[]
+}
+
+model Hit {
+  hitId       String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  userAgent   String?
+  ipAddr      String?
+  referer     String?
+  rawHeaders  String
+  shortLink   ShortLink @relation(fields: [linkId], references: [linkId])
+  linkId      String
 }

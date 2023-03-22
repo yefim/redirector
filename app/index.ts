@@ -13,19 +13,7 @@ app.get('/healthcheck', (_req, res) => {
   res.send('hello world');
 });
 
-app.get('/link', (_req, res) => {
-  res.send('<a href="/">link</a>');
-});
-
-app.get('/ip', (req, res) => {
-  const ip = requestIp.getClientIp(req);
-  res.send(ip);
-});
-
 app.get('/', async (req, res) => {
-  console.log(req);
-  console.log(req.headers);
-
   const link = await prisma.shortLink.findUnique({
     where: {
       host: req.hostname,
@@ -33,12 +21,53 @@ app.get('/', async (req, res) => {
   });
 
   if (link) {
-    // TODO: log the hit
+    await prisma.hit.create({data: {
+      userAgent: req.headers['user-agent'] || null,
+      ipAddr: requestIp.getClientIp(req) || null,
+      referer: req.headers['referer'] || null,
+      rawHeaders: JSON.stringify(req.headers),
+      linkId: link.linkId,
+    }});
 
     res.send(`redirecting to ${link.redirectUrl}`);
   } else {
-    res.send(`link does not exist for ${req.hostname}`);
+    res.status(404).send(`link does not exist for ${req.hostname}`);
   }
+});
+
+app.get('/count', async (req, res) => {
+  const hitCount = await prisma.hit.count({
+    where: {
+      shortLink: { host: req.hostname },
+    }
+  });
+
+  if (hitCount > 0) {
+    res.send('' + hitCount);
+  } else {
+    res.status(404).send('Not found');
+  }
+});
+
+app.get('/last/:count', async (req, res) => {
+  let count = parseInt(req.params.count, 10);
+  count = isNaN(count) ? 10 : count;
+
+  const hits = await prisma.hit.findMany({
+    select: {
+      userAgent: true,
+      ipAddr: true,
+      referer: true,
+      createdAt: true,
+    },
+    where: {
+      shortLink: { host: req.hostname },
+    },
+    take: count,
+    orderBy: { createdAt: 'desc' },
+  });
+
+  res.send(hits);
 });
 
 app.get('/edit', async (req, res) => {
@@ -48,6 +77,12 @@ app.get('/edit', async (req, res) => {
     },
   });
 
+  const hitCount = link ? await prisma.hit.count({
+    where: {
+      linkId: link.linkId
+    }
+  }) : 0;
+
   res.send(`<form method="post" action="" onsubmit="navigator.clipboard.writeText('https://' + window.location.host)">
       <label>Redirect URL
         <input type="text" name="redirectUrl" value="${link && link.redirectUrl || ''}">
@@ -56,7 +91,8 @@ app.get('/edit', async (req, res) => {
         <input type="password" name="password">
       </label>
       <button type="submit">Submit</button>
-    </form>`);
+    </form>
+    <p>This link has been visited ${hitCount} times.</p>`);
 });
 
 app.post('/edit', async (req, res) => {
