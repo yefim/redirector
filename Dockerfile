@@ -38,7 +38,7 @@ RUN npx prisma generate
 
 # app code changes all the time
 ADD . .
-RUN npm run build && npm run build:client
+RUN npm run build
 
 # build smaller image for running
 FROM base
