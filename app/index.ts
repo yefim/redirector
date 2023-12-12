@@ -2,6 +2,19 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import requestIp from 'request-ip';
 import { PrismaClient } from '@prisma/client';
+import * as Sentry from '@sentry/node';
+import { ProfilingIntegration } from '@sentry/profiling-node';
+
+Sentry.init({
+  dsn: 'https://051c550e13b724ba3af9f738b8d3190d@o4506380711952384.ingest.sentry.io/4506380712148992',
+  integrations: [
+    new ProfilingIntegration(),
+  ],
+  // Performance Monitoring
+  tracesSampleRate: 1.0,
+  // Set sampling rate for profiling - this is relative to tracesSampleRate
+  profilesSampleRate: 1.0,
+});
 
 const prisma = new PrismaClient();
 const app = express();
@@ -86,17 +99,16 @@ app.get('/edit', async (req, res) => {
 
   const hitCount = link
     ? await prisma.hit.count({
-        where: {
-          linkId: link.linkId,
-        },
-      })
+      where: {
+        linkId: link.linkId,
+      },
+    })
     : 0;
 
   res.send(`<form method="post" action="" onsubmit="navigator.clipboard.writeText('https://' + window.location.host)">
       <label>Redirect URL
-        <input type="text" name="redirectUrl" value="${
-          (link && link.redirectUrl) || ''
-        }">
+        <input type="text" name="redirectUrl" value="${(link && link.redirectUrl) || ''
+    }">
       </label>
       <label>Password
         <input type="password" name="password">
