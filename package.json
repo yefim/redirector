@@ -11,7 +11,6 @@
     "dev:client": "parcel client/client.html"
   },
   "keywords": [],
-  "author": "Kent C. Dodds <me@kentcdodds.com> (https://kentcdodds.com/)",
   "license": "MIT",
   "devDependencies": {
     "@types/chokidar": "^2.1.3",
