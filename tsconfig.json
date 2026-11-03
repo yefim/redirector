@@ -1,14 +1,19 @@
 {
   "include": ["app/**/*.ts"],
   "compilerOptions": {
-    "lib": ["ES2022"],
+    "lib": ["ES2024"],
+    "types": ["node"],
     "isolatedModules": true,
     "esModuleInterop": true,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+    "moduleDetection": "force",
     "resolveJsonModule": true,
-    "target": "ES2022",
+    "target": "ES2024",
     "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noEmitOnError": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "outDir": "./build"
