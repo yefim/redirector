@@ -1,6 +1,6 @@
 import './instrument';
 import express from 'express';
-import requestIp from 'request-ip';
+import { getClientIp } from './client-ip';
 import { prisma } from './db';
 import * as Sentry from '@sentry/node';
 
@@ -27,7 +27,7 @@ app.get('/', async (req, res) => {
     await prisma.hit.create({
       data: {
         userAgent: req.headers['user-agent'] || null,
-        ipAddr: requestIp.getClientIp(req) || null,
+        ipAddr: getClientIp(req),
         referer: req.headers['referer'] || null,
         rawHeaders: JSON.stringify(req.headers),
         linkId: link.linkId,
