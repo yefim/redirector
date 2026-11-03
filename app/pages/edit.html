@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Edit your redirect</title>
+    <link rel="stylesheet" href="/edit.css">
+  </head>
+  <body>
+    <main class="editor">
+      <header class="page-header">
+        <span class="link-mark" aria-hidden="true">↗</span>
+        <p class="eyebrow">Link settings</p>
+        <h1>Edit your redirect</h1>
+        <p class="description">Choose where visitors go when they open this link.</p>
+      </header>
+
+      <section class="card" aria-label="Redirect settings">
+        <form method="post" action="/edit" onsubmit="navigator.clipboard.writeText('https://' + window.location.host)">
+          <div class="field">
+            <label for="redirect-url">Destination URL</label>
+            <input id="redirect-url" name="redirectUrl" type="text" inputmode="url" autocomplete="url" placeholder="https://example.com" value="{{redirectUrl}}" required aria-describedby="url-hint">
+            <p class="hint" id="url-hint">The address visitors will be redirected to.</p>
+          </div>
+
+          <div class="field">
+            <label for="password">Edit password</label>
+            <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Enter your password" required>
+          </div>
+
+          <button type="submit">Save redirect <span aria-hidden="true">↗</span></button>
+          <p class="save-note">Changes take effect immediately.</p>
+        </form>
+
+        <div class="visits">
+          <span>Total visits</span>
+          <strong>{{hitCount}}</strong>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

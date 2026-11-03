@@ -1,7 +1,9 @@
 import './instrument';
 import express from 'express';
+import { resolve } from 'node:path';
 import { getClientIp } from './client-ip';
 import { prisma } from './db';
+import { renderEditPage } from './edit-page';
 import * as Sentry from '@sentry/node';
 
 const app = express();
@@ -75,6 +77,10 @@ app.get('/last/:count', async (req, res) => {
   res.send(hits);
 });
 
+app.get('/edit.css', (_req, res) => {
+  res.sendFile(resolve('app/pages/edit.css'));
+});
+
 app.get('/edit', async (req, res) => {
   const link = await prisma.shortLink.findUnique({
     where: {
@@ -90,17 +96,7 @@ app.get('/edit', async (req, res) => {
     })
     : 0;
 
-  res.send(`<form method="post" action="" onsubmit="navigator.clipboard.writeText('https://' + window.location.host)">
-      <label>Redirect URL
-        <input type="text" name="redirectUrl" value="${(link && link.redirectUrl) || ''
-    }">
-      </label>
-      <label>Password
-        <input type="password" name="password">
-      </label>
-      <button type="submit">Submit</button>
-    </form>
-    <p>This link has been visited ${hitCount} times.</p>`);
+  res.type('html').send(await renderEditPage(link?.redirectUrl || '', hitCount));
 });
 
 app.post('/edit', async (req, res) => {
