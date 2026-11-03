@@ -23,6 +23,9 @@ COPY --from=deps /app/node_modules /app/node_modules
 ADD package.json package-lock.json ./
 RUN npm prune --omit=dev
 
+# Catch missing native profiler binaries before deploying the image.
+RUN node -e "require('@sentry/profiling-node')"
+
 # build app
 FROM base as build
 

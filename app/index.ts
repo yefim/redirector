@@ -1,20 +1,9 @@
+import './instrument';
 import express from 'express';
 import bodyParser from 'body-parser';
 import requestIp from 'request-ip';
 import { PrismaClient } from '@prisma/client';
 import * as Sentry from '@sentry/node';
-import { ProfilingIntegration } from '@sentry/profiling-node';
-
-Sentry.init({
-  dsn: 'https://051c550e13b724ba3af9f738b8d3190d@o4506380711952384.ingest.sentry.io/4506380712148992',
-  integrations: [
-    new ProfilingIntegration(),
-  ],
-  // Performance Monitoring
-  tracesSampleRate: 1.0,
-  // Set sampling rate for profiling - this is relative to tracesSampleRate
-  profilesSampleRate: 1.0,
-});
 
 const prisma = new PrismaClient();
 const app = express();
@@ -139,6 +128,8 @@ app.post('/edit', async (req, res) => {
     res.send('wrong password');
   }
 });
+
+Sentry.setupExpressErrorHandler(app);
 
 app.listen(port, () => {
   console.log(`Server listening on ${port}`);

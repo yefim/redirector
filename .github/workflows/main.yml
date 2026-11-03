@@ -1,5 +1,8 @@
 name: Deploy to Fly
 on: [push]
+concurrency:
+  group: fly-deploy
+  cancel-in-progress: false
 jobs:
   deploy:
     name: Deploy proxy
