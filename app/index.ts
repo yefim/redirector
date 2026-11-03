@@ -1,6 +1,5 @@
 import './instrument';
 import express from 'express';
-import bodyParser from 'body-parser';
 import requestIp from 'request-ip';
 import { prisma } from './db';
 import * as Sentry from '@sentry/node';
@@ -8,7 +7,7 @@ import * as Sentry from '@sentry/node';
 const app = express();
 const port = process.env.PORT || 3333;
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false }));
 
 app.get('/healthcheck', async (_req, res) => {
   console.log('Healthcheck hit.');
@@ -106,7 +105,7 @@ app.get('/edit', async (req, res) => {
 
 app.post('/edit', async (req, res) => {
   const hostname = req.hostname;
-  const { redirectUrl, password } = req.body;
+  const { redirectUrl, password } = req.body || {};
 
   if (redirectUrl && password === process.env.EDIT_PASSWORD) {
     const link = await prisma.shortLink.upsert({

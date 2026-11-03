@@ -23,7 +23,6 @@
     "@prisma/client": "7.10.1",
     "@sentry/node": "^10.78.0",
     "@sentry/profiling-node": "^10.78.0",
-    "body-parser": "^1.20.9",
     "dotenv": "18.0.9",
     "express": "^5.3.0",
     "prisma": "7.10.1",
