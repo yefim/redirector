@@ -19,7 +19,7 @@
         <form method="post" action="/edit" onsubmit="navigator.clipboard.writeText('https://' + window.location.host)">
           <div class="field">
             <label for="redirect-url">Destination URL</label>
-            <input id="redirect-url" name="redirectUrl" type="text" inputmode="url" autocomplete="url" placeholder="https://example.com" value="{{redirectUrl}}" required aria-describedby="url-hint">
+            <input id="redirect-url" name="redirectUrl" type="text" inputmode="url" autocomplete="url" placeholder="https://example.com" value="<%= redirectUrl %>" required aria-describedby="url-hint">
             <p class="hint" id="url-hint">The address visitors will be redirected to.</p>
           </div>
 
@@ -34,7 +34,7 @@
 
         <div class="visits">
           <span>Total visits</span>
-          <strong>{{hitCount}}</strong>
+          <strong><%= hitCount %></strong>
         </div>
       </section>
     </main>

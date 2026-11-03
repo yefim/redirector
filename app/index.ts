@@ -3,11 +3,13 @@ import express from 'express';
 import { resolve } from 'node:path';
 import { getClientIp } from './client-ip';
 import { prisma } from './db';
-import { renderEditPage } from './edit-page';
 import * as Sentry from '@sentry/node';
 
 const app = express();
 const port = process.env.PORT || 3333;
+
+app.set('views', resolve('app/pages'));
+app.set('view engine', 'ejs');
 
 app.use(express.urlencoded({ extended: false }));
 
@@ -96,7 +98,7 @@ app.get('/edit', async (req, res) => {
     })
     : 0;
 
-  res.type('html').send(await renderEditPage(link?.redirectUrl || '', hitCount));
+  res.render('edit', { redirectUrl: link?.redirectUrl || '', hitCount });
 });
 
 app.post('/edit', async (req, res) => {
