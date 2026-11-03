@@ -10,8 +10,6 @@ const port = process.env.PORT || 3333;
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use(express.static('public'));
-
 app.get('/healthcheck', async (_req, res) => {
   console.log('Healthcheck hit.');
   // Make sure we can hit DB.
