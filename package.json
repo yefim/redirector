@@ -4,10 +4,10 @@
   "description": "",
   "scripts": {
     "start": "node ./start.js",
-    "setup": "npm install && cpy .env.example . --rename=.env && prisma migrate reset --force && prisma generate",
+    "setup": "npm install && cp .env.example .env && prisma migrate reset --force && prisma generate",
     "build": "prisma generate && tsc",
     "test": "npm run build && node --test test/*.test.cjs",
-    "dev": "cross-env PORT=3333 tsx watch ./app"
+    "dev": "tsx watch ./app"
   },
   "keywords": [],
   "license": "MIT",
@@ -15,8 +15,6 @@
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.6",
     "@types/request-ip": "^0.0.41",
-    "cpy-cli": "^4.2.0",
-    "cross-env": "^7.0.3",
     "prettier": "2.8.8",
     "tsx": "^4.23.15"
   },
