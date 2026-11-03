@@ -17,7 +17,10 @@
         <form method="post" action="/edit" onsubmit="navigator.clipboard.writeText('https://' + window.location.host)">
           <div class="field">
             <label for="redirect-url">Destination URL</label>
-            <input id="redirect-url" name="redirectUrl" type="text" inputmode="url" autocomplete="url" placeholder="https://example.com" value="<%= redirectUrl %>" required aria-describedby="url-hint">
+            <div class="url-input">
+              <input id="redirect-url" name="redirectUrl" type="text" inputmode="url" autocomplete="url" placeholder="https://example.com" value="<%= redirectUrl %>" required aria-describedby="url-hint">
+              <button class="clear-button" type="button" onclick="this.form.elements.redirectUrl.value = ''; this.form.elements.redirectUrl.focus()">Clear</button>
+            </div>
             <p class="hint" id="url-hint">The address visitors will be redirected to.</p>
           </div>
 

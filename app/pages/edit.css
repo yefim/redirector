@@ -123,6 +123,26 @@ button:hover {
   background: #24442d;
 }
 
+.url-input {
+  display: flex;
+  gap: 8px;
+}
+
+.url-input input {
+  min-width: 0;
+}
+
+.clear-button {
+  width: auto;
+  margin-top: 0;
+  background: #e9eee4;
+  color: #31543b;
+}
+
+.clear-button:hover {
+  background: #d8dfd4;
+}
+
 .save-note {
   margin: 12px 0 0;
   text-align: center;
