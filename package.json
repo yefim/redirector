@@ -4,8 +4,9 @@
   "description": "",
   "scripts": {
     "start": "node ./start.js",
-    "setup": "npm install && cpy .env.example . --rename=.env && prisma migrate reset --force",
-    "build": "tsc",
+    "setup": "npm install && cpy .env.example . --rename=.env && prisma migrate reset --force && prisma generate",
+    "build": "prisma generate && tsc",
+    "test": "npm run build && node --test test/*.test.cjs",
     "build:client": "parcel build --dist-dir public/ client/client.html",
     "dev": "cross-env PORT=3333 tsx watch ./app",
     "dev:client": "parcel client/client.html"
@@ -24,12 +25,14 @@
     "tsx": "^4.23.15"
   },
   "dependencies": {
-    "@prisma/client": "^4.16.2",
+    "@prisma/adapter-better-sqlite3": "7.10.1",
+    "@prisma/client": "7.10.1",
     "@sentry/node": "^10.78.0",
     "@sentry/profiling-node": "^10.78.0",
     "body-parser": "^1.20.9",
+    "dotenv": "18.0.9",
     "express": "^5.3.0",
-    "prisma": "^4.16.2",
+    "prisma": "7.10.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "request-ip": "^3.3.0",

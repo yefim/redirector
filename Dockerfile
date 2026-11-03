@@ -23,8 +23,9 @@ COPY --from=deps /app/node_modules /app/node_modules
 ADD package.json package-lock.json ./
 RUN npm prune --omit=dev
 
-# Catch missing native profiler binaries before deploying the image.
+# Catch missing native binaries before deploying the image.
 RUN node -e "require('@sentry/profiling-node')"
+RUN node -e "new (require('@prisma/adapter-better-sqlite3').PrismaBetterSqlite3)({url:':memory:'}).connect().then(db => db.dispose())"
 
 # build app
 FROM base as build
@@ -33,11 +34,6 @@ RUN mkdir /app/
 WORKDIR /app/
 
 COPY --from=deps /app/node_modules /app/node_modules
-
-# schema doesn't change much so these will stay cached
-ADD prisma /app/prisma
-
-RUN npx prisma generate
 
 # app code changes all the time
 ADD . .
@@ -54,7 +50,6 @@ RUN mkdir /app/
 WORKDIR /app/
 
 COPY --from=production-deps /app/node_modules /app/node_modules
-COPY --from=build /app/node_modules/.prisma /app/node_modules/.prisma
 COPY --from=build /app/build /app/build
 
 ADD . .

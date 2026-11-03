@@ -2,10 +2,9 @@ import './instrument';
 import express from 'express';
 import bodyParser from 'body-parser';
 import requestIp from 'request-ip';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from './db';
 import * as Sentry from '@sentry/node';
 
-const prisma = new PrismaClient();
 const app = express();
 const port = process.env.PORT || 3333;
 
