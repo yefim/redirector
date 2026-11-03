@@ -8,6 +8,11 @@ primary_region = "ord"
 kill_signal = "SIGINT"
 kill_timeout = "5s"
 
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1
+
 [experimental]
   auto_rollback = true
 
