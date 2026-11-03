@@ -4,7 +4,7 @@ const os = require("os");
 const path = require("path");
 
 async function go() {
-  await exec("npx prisma migrate deploy");
+  await exec("node ./node_modules/prisma/build/index.js migrate deploy");
 
   console.log("Starting app...");
   await exec("node ./build");

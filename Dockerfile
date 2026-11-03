@@ -54,4 +54,4 @@ COPY --from=build /app/build /app/build
 
 ADD . .
 
-CMD ["npm", "start"]
+CMD ["node", "./start.js"]
